@@ -1,0 +1,43 @@
+Table student {
+  id integer [pk]
+  academic_level varchar
+  gpa float
+  intended_field category
+  location place
+  eligibility category
+  interests varchar
+  extracurricular_acts category
+  university_type string
+}
+
+Table opportunity {
+  id integer [pk]
+  name varchar
+  organization varchar
+  description varchar
+  deadline date
+  location place
+  fields category
+  min_gpa float
+  level category
+  eligibility category
+  url varchar
+  tags category
+}
+
+Enum status_type {
+  saved
+  applying
+  applied
+  deadline_approaching
+}
+
+Table saved_opportunities {
+  id integer [pk]
+  student_id integer [not null]
+  opportunity_id integer [not null]
+  status status_type
+}
+
+Ref: saved_opportunities.student_id > student.id
+Ref: saved_opportunities.opportunity_id > opportunity.id
