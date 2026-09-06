@@ -1,7 +1,7 @@
 Table student {
   id integer [pk]
   academic_level varchar
-  gpa float
+  academic_average float
   intended_field category
   location place
   eligibility category
@@ -18,7 +18,7 @@ Table opportunity {
   deadline date
   location place
   fields category
-  min_gpa float
+  min_average float
   level category
   eligibility category
   url varchar
