@@ -28,6 +28,7 @@ app.use(session({
 // TODO 4: mount your students route file
 app.use('/students', require('./routes/students'));
 app.use('/opportunities', require('./routes/opportunities'));
+app.use('/saved-opportunities', require('./routes/savedOpportunities'));
 
 const PORT = process.env.PORT || 3000;
 // TODO 5: app.listen with a console.log, same pattern as the practice server
