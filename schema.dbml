@@ -8,6 +8,8 @@ Table student {
   interests varchar
   extracurricular_acts category
   university_type string
+  email varchar [unique]
+  password_hash varchar
 }
 
 Table opportunity {

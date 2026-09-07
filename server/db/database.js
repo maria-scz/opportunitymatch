@@ -16,7 +16,9 @@ db.exec(`
     eligibility TEXT,
     interests TEXT,
     extracurricular_acts TEXT,
-    university_type TEXT
+    university_type TEXT,
+    email TEXT UNIQUE,
+    password_hash TEXT
   );
 
 
