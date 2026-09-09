@@ -4,17 +4,37 @@ const db = require('../db/database');
 
 // GET all — optionally filtered by ?field=
 router.get('/', (req, res) => {
-  // TODO 1: check req.query.field.
-  // If it exists: SELECT * FROM opportunity WHERE fields = ?, using .all(req.query.field)
-  // If not: just SELECT * FROM opportunity, no WHERE
-  // Either way, res.json(...) whatever rows come back
-  if (req.query.field){
-    const rows = db.prepare('SELECT * FROM opportunity WHERE fields = ?').all(req.query.field);
-    res.json(rows);
-  } else{
-    const rows = db.prepare('SELECT * FROM opportunity').all();
-    res.json(rows);
+  const { field, location, deadline, min_average } = req.query;
+
+  let query = 'SELECT * FROM opportunity WHERE 1=1';
+  const params = [];
+
+  if (field) {
+    query += ' AND fields = ?';
+    params.push(field);
   }
+  // TODO 2: same pattern for location — column name is `location`
+  if (location) {
+    query += ' AND location = ?';
+    params.push(location);
+  }
+  // TODO 3: for deadline — think about whether this should be an exact match,
+  // or "due on or before this date" (hint: which comparison operator means that?)
+  if (deadline) {
+    query += ' AND deadline <= ?';
+    params.push(deadline);
+  }
+
+
+  // TODO 4: for min_average — using the qualification logic from above,
+  // not exact match
+  if (min_average) {
+    query += ' AND min_average <= ?';
+    params.push(min_average);
+  }
+
+  const rows = db.prepare(query).all(...params);
+  res.json(rows);
 });
 
 // GET one by id
