@@ -25,7 +25,6 @@ function Profile() {
       <input value={academicLevel} onChange={(e) => setAcademicLevel(e.target.value)} placeholder="Academic Level" />
       <input value={academicAverage} onChange={(e) => setAcademicAverage(e.target.value)} placeholder="Academic Average" />
       <input value={intendedField} onChange={(e) => setIntendedField(e.target.value)} placeholder="Intended Field" />
-
       <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" />
       <input value={eligibility} onChange={(e) => setEligibility(e.target.value)} placeholder="Eligibility" />
       <input value={interests} onChange={(e) => setInterests(e.target.value)} placeholder="Interests" />
