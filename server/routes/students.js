@@ -25,4 +25,26 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const student = db.prepare('SELECT * FROM student WHERE email = ?').get(email);
+  // TODO 1: if no student found, respond 401 with an error
+  if (!student) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+  // TODO 2: bcrypt.compare(password, student.password_hash) — needs await
+  const passwordMatch = await bcrypt.compare(password, student.password_hash);
+  // TODO 3: if it doesn't match, respond 401 with an error
+  if(!passwordMatch){
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
+  // TODO 4: if it matches, respond 200 with { id: student.id, email: student.email }
+  // — never send password_hash back, ever
+  return res.status(200).json({
+    id: student.id,
+    email: student.email
+  });
+});
+
 module.exports = router;
