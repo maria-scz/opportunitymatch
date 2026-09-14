@@ -47,4 +47,18 @@ router.post('/login', async (req, res) => {
   });
 });
 
+router.put('/:id', (req, res) => {
+  const { academic_level, academic_average, intended_field, location, eligibility, interests, extracurricular_acts, university_type } = req.body;
+
+  // TODO 1: UPDATE student SET academic_level = ?, academic_average = ?, intended_field = ?,
+  // location = ?, eligibility = ?, interests = ?, extracurricular_acts = ?, university_type = ?
+  // WHERE id = ? — ocho columnas, ocho valores, más req.params.id al final
+
+  // TODO 2: responder 200 con un mensaje de éxito
+  db.prepare('UPDATE student SET academic_level = ?, academic_average = ?, intended_field = ?, location = ?, eligibility = ?, interests = ?, extracurricular_acts = ?, university_type = ? WHERE id = ?')
+  .run(academic_level, academic_average, intended_field, location, eligibility, interests, extracurricular_acts, university_type, req.params.id);
+
+  res.status(200).json({ message: 'Perfil actualizado exitosamente.' });
+});
+
 module.exports = router;

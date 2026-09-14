@@ -12,11 +12,38 @@ function Profile() {
   const[extracurricularActs, setExtracurricularActs] = useState('');
   const[universityType, setUniversityType] = useState('');
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // TODO: nothing to wire this to yet — a real save route doesn't exist yet.
-    // For now, just prove the form works:
-    console.log({ academicLevel, academicAverage, intendedField });
+  
+    const studentId = localStorage.getItem('studentId');
+    // TODO 1: si no hay studentId (nadie ha iniciado sesión), usa un alert()
+    // diciendo algo como "please log in first" y haz return — no tiene sentido
+    // seguir si no sabemos a quién pertenece este perfil
+    if (!studentId) {
+      alert('Intenta hacer log in primero!');
+      return;
+    }
+  
+    // TODO 2: fetch a `http://localhost:3000/students/${studentId}` — mismo patrón
+    // de siempre, pero con method: 'PUT' en vez de 'POST', y el body con las
+    // ocho variables de estado (academicLevel, academicAverage, etc.)
+    const response = await fetch(`http://localhost:3000/students/${studentId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        academic_level: academicLevel,
+        academic_average: academicAverage,
+        intended_field: intendedField,
+        location: location,
+        eligibility: eligibility,
+        interests: interests,
+        extracurricular_acts: extracurricularActs,
+        university_type: universityType
+      })
+    });
+    
+    const data = await response.json();
+    alert(data.message);
   }
 
   return (
