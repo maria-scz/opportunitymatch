@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 function Dashboard() {
   const [saved, setSaved] = useState([]);
@@ -8,7 +9,7 @@ function Dashboard() {
       const studentId = localStorage.getItem('studentId');
       if (!studentId) return;
 
-      const response = await fetch(`http://localhost:3000/saved-opportunities?student_id=${studentId}`);
+      const response = await fetch(`${API_URL}/saved-opportunities?student_id=${studentId}`);
       const data = await response.json();
       setSaved(data);
     }
