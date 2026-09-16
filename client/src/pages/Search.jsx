@@ -58,12 +58,13 @@ function Search() {
       </form>
 
       <div>
-        {results.map(opportunity => (
-            <div key={opportunity.id}>
-            <p>{opportunity.name}</p>
-            <p>{opportunity.min_average}</p>
-            </div>
-        ))}
+      {results.map(opportunity => (
+        <div key={opportunity.id}>
+          <p>{opportunity.name}</p>
+          <p>{opportunity.min_average}</p>
+          <button onClick={() => handleSave(opportunity.id)}>Guardar</button>
+        </div>
+      ))}
       </div>
     </div>
   );

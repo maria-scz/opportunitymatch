@@ -73,4 +73,56 @@ router.delete('/:id', (req, res) => {
   res.status(200).json({message: 'Opportunidad borrada'})
 });
 
+router.get('/:id/match/:studentId', (req, res) => {
+  const opportunity = db.prepare('SELECT * FROM opportunity WHERE id = ?').get(req.params.id);
+  const student = db.prepare('SELECT * FROM student WHERE id = ?').get(req.params.studentId);
+
+  if (!opportunity || !student) {
+    return res.status(404).json({ error: 'No encontrado' });
+  }
+
+  let score = 0;
+  const reasons = [];
+
+  // Academic average: 20%
+  if (student.academic_average >= opportunity.min_average) {
+    score += 0.20;
+    reasons.push('tu promedio califica');
+  }
+
+  // Field: 25%
+  if (student.intended_field === opportunity.fields) {
+    score += 0.25;
+    reasons.push('tu campo de estudio coincide');
+  }
+
+  // Location: 15%
+  if (student.location === opportunity.location || opportunity.location === 'Remote') {
+    score += 0.15;
+    reasons.push('la ubicación es compatible');
+  }
+
+  // Academic level: 15%
+  if (student.academic_level === opportunity.level) {
+    score += 0.15;
+    reasons.push('tu nivel académico coincide');
+  }
+
+  // Interests vs tags: 15%
+  if (student.interests && opportunity.tags && opportunity.tags.includes(student.interests)) {
+    score += 0.15;
+    reasons.push('tus intereses coinciden');
+  }
+
+  // Deadline not passed: 10%
+  if (new Date(opportunity.deadline) > new Date()) {
+    score += 0.10;
+    reasons.push('la fecha límite sigue abierta');
+  }
+
+  res.json({
+    match_percentage: Math.round(score * 100),
+    reasoning: reasons.join(', ') || 'Poca compatibilidad con tu perfil'
+  });
+});
 module.exports = router;
