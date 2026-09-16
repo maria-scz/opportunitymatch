@@ -29,6 +29,23 @@ function Search() {
     setResults(data)
   }
 
+  async function handleSave(opportunityId) {
+    const studentId = localStorage.getItem('studentId');
+    if (!studentId) {
+      alert('Inicia sesión primero');
+      return;
+    }
+  
+    const response = await fetch('http://localhost:3000/saved-opportunities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ student_id: studentId, opportunity_id: opportunityId, status: 'saved' })
+    });
+  
+    const data = await response.json();
+    alert(response.ok ? 'Guardado!' : data.error);
+  }
+
   return (
     <div>
       <h2>Search Opportunities</h2>
