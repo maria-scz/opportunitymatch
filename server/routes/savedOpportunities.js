@@ -24,12 +24,16 @@ router.post('/', (req, res) => {
   }
 });
 
-// GET — one student's saved list, via ?student_id=
+// GET
 router.get('/', (req, res) => {
-  // TODO 5: SELECT * FROM saved_opportunities WHERE student_id = ?
-  // using .all(req.query.student_id), then res.json(...)
-  const rows = db.prepare('SELECT * FROM saved_opportunities WHERE student_id = ?').all(req.query.student_id);
-  res.json(rows)
+  const rows = db.prepare(`
+    SELECT saved_opportunities.id, saved_opportunities.status,
+           opportunity.name, opportunity.deadline, opportunity.organization
+    FROM saved_opportunities
+    JOIN opportunity ON saved_opportunities.opportunity_id = opportunity.id
+    WHERE saved_opportunities.student_id = ?
+  `).all(req.query.student_id);
+  res.json(rows);
 });
 
 // PUT — update just the status (scoped down, same reasoning as opportunities' PUT)
