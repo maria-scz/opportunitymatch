@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_URL } from '../config';
 
 function Search() {
   const [field, setField] = useState('');
@@ -10,23 +11,16 @@ function Search() {
   async function handleSearch(e) {
     e.preventDefault();
 
-    // TODO 1: build a URLSearchParams object, only appending filters that have a value
-    // (same if-check pattern as tonight's backend route)
     const params = new URLSearchParams();
     if (field) params.append('field', field);
     if (minAverage) params.append('min_average', minAverage);
     if (location) params.append('location', location);
     if (deadline) params.append('deadline', deadline);
 
-    params.toString(); 
-
-    // TODO 2: fetch from `http://localhost:3000/opportunities?${params.toString()}`
-    // — two awaits, same shape as every fetch since Day 2
-    const response = await fetch(`http://localhost:3000/opportunities?${params.toString()}`);
+    const response = await fetch(`${API_URL}/opportunities?${params.toString()}`);
     const data = await response.json();
 
-    // TODO 3: setResults(...) with whatever came back
-    setResults(data)
+    setResults(data);
   }
 
   async function handleSave(opportunityId) {
@@ -35,13 +29,13 @@ function Search() {
       alert('Inicia sesión primero');
       return;
     }
-  
-    const response = await fetch('http://localhost:3000/saved-opportunities', {
+
+    const response = await fetch(`${API_URL}/saved-opportunities`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ student_id: studentId, opportunity_id: opportunityId, status: 'saved' })
     });
-  
+
     const data = await response.json();
     alert(response.ok ? 'Guardado!' : data.error);
   }
@@ -58,13 +52,13 @@ function Search() {
       </form>
 
       <div>
-      {results.map(opportunity => (
-        <div key={opportunity.id}>
-          <p>{opportunity.name}</p>
-          <p>{opportunity.min_average}</p>
-          <button onClick={() => handleSave(opportunity.id)}>Guardar</button>
-        </div>
-      ))}
+        {results.map(opportunity => (
+          <div key={opportunity.id}>
+            <p>{opportunity.name}</p>
+            <p>{opportunity.min_average}</p>
+            <button onClick={() => handleSave(opportunity.id)}>Guardar</button>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { API_URL } from '../config';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ function Login() {
 
     // TODO 1: POST to http://localhost:3000/students/login with email + password
     // in the body — same fetch shape as Day 2's practice POST, two awaits
-    const response = await fetch('http://localhost:3000/students/login', {
+    const response = await fetch(`${API_URL}/students/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

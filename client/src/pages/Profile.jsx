@@ -1,33 +1,26 @@
 import { useState } from 'react';
+import { API_URL } from '../config';
 
 function Profile() {
   const [academicLevel, setAcademicLevel] = useState('');
   const [academicAverage, setAcademicAverage] = useState('');
   const [intendedField, setIntendedField] = useState('');
-  // TODO: same pattern — one useState line each — for:
-  // location, eligibility, interests, extracurricularActs, universityType
-  const[location, setLocation] = useState('');
-  const[eligibility, setEligibility] = useState('');
-  const[interests, setInterests] = useState('');
-  const[extracurricularActs, setExtracurricularActs] = useState('');
-  const[universityType, setUniversityType] = useState('');
+  const [location, setLocation] = useState('');
+  const [eligibility, setEligibility] = useState('');
+  const [interests, setInterests] = useState('');
+  const [extracurricularActs, setExtracurricularActs] = useState('');
+  const [universityType, setUniversityType] = useState('');
 
   async function handleSubmit(e) {
     e.preventDefault();
-  
+
     const studentId = localStorage.getItem('studentId');
-    // TODO 1: si no hay studentId (nadie ha iniciado sesión), usa un alert()
-    // diciendo algo como "please log in first" y haz return — no tiene sentido
-    // seguir si no sabemos a quién pertenece este perfil
     if (!studentId) {
       alert('Intenta hacer log in primero!');
       return;
     }
-  
-    // TODO 2: fetch a `http://localhost:3000/students/${studentId}` — mismo patrón
-    // de siempre, pero con method: 'PUT' en vez de 'POST', y el body con las
-    // ocho variables de estado (academicLevel, academicAverage, etc.)
-    const response = await fetch(`http://localhost:3000/students/${studentId}`, {
+
+    const response = await fetch(`${API_URL}/students/${studentId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -41,7 +34,7 @@ function Profile() {
         university_type: universityType
       })
     });
-    
+
     const data = await response.json();
     alert(data.message);
   }
@@ -57,8 +50,6 @@ function Profile() {
       <input value={interests} onChange={(e) => setInterests(e.target.value)} placeholder="Interests" />
       <input value={extracurricularActs} onChange={(e) => setExtracurricularActs(e.target.value)} placeholder="Extracurricular Activities" />
       <input value={universityType} onChange={(e) => setUniversityType(e.target.value)} placeholder="University Type" />
-      {/* TODO: same <input value={...} onChange={...} placeholder="..." /> pattern
-          for the remaining 5 fields */}
       <button type="submit">Save Profile</button>
     </form>
   );
