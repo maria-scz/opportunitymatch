@@ -22,6 +22,7 @@ function Profile() {
 
     const response = await fetch(`${API_URL}/students/${studentId}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         academic_level: academicLevel,

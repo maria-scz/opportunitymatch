@@ -6,7 +6,13 @@ const session = require('express-session');
 const app = express();
 
 // TODO 1: register the cors middleware
-app.use(cors());
+// Las cookies de sesión necesitan origin explícito + credentials (no se puede usar cors() a secas).
+const isProd = process.env.NODE_ENV === 'production' || !!process.env.RENDER;
+app.set('trust proxy', 1); // Render / Vercel están detrás de un proxy HTTPS
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
 // TODO 2: register express.json() middleware
 app.use(express.json());
@@ -21,7 +27,13 @@ app.use(express.json());
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized : false
+    saveUninitialized : false,
+    cookie: {
+      httpOnly: true,            // JavaScript del navegador no puede leer la cookie
+      sameSite: 'lax',
+      secure: isProd,            // en producción solo viaja por HTTPS
+      maxAge: 1000 * 60 * 60 * 24 * 7
+    }
 })
 );
 

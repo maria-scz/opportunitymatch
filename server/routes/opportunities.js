@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
+const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 // GET all — optionally filtered by ?field=
 router.get('/', (req, res) => {
@@ -49,7 +50,7 @@ router.get('/:id', (req, res) => {
   });
 
 // POST — create (this is how you'll seed real data)
-router.post('/', (req, res) => {
+router.post('/', requireAdmin, (req, res) => {
 
 const { name, organization, description, deadline, location, fields, min_average, level, eligibility, url, tags } =
  req.body;
@@ -60,20 +61,24 @@ const { name, organization, description, deadline, location, fields, min_average
 });
 
 // PUT — update (scoped down on purpose: just min_average for now, not every field)
-router.put('/:id', (req, res) => {
+router.put('/:id', requireAdmin, (req, res) => {
     const { min_average } = req.body;
     db.prepare('UPDATE opportunity SET min_average = ? WHERE id = ?').run(min_average, req.params.id);
     res.status(200).json({ message: 'Opportunity actualizada' });
   });
 
 // DELETE
-router.delete('/:id', (req, res) => {
+router.delete('/:id', requireAdmin, (req, res) => {
   // TODO 7: DELETE FROM opportunity WHERE id = ?, respond with a success message
   db.prepare('DELETE FROM opportunity WHERE id = ?').run(req.params.id)
   res.status(200).json({message: 'Opportunidad borrada'})
 });
 
-router.get('/:id/match/:studentId', (req, res) => {
+router.get('/:id/match/:studentId', requireAuth, (req, res) => {
+  // Solo puedes ver TU match, no el de otra persona
+  if (Number(req.params.studentId) !== req.session.studentId) {
+    return res.status(403).json({ error: 'No autorizado' });
+  }
   const opportunity = db.prepare('SELECT * FROM opportunity WHERE id = ?').get(req.params.id);
   const student = db.prepare('SELECT * FROM student WHERE id = ?').get(req.params.studentId);
 

@@ -9,9 +9,11 @@ function Dashboard() {
       const studentId = localStorage.getItem('studentId');
       if (!studentId) return;
 
-      const response = await fetch(`${API_URL}/saved-opportunities?student_id=${studentId}`);
+      const response = await fetch(`${API_URL}/saved-opportunities`, { credentials: 'include' });
+      if (!response.ok) return;   
       const data = await response.json();
       setSaved(data);
+
     }
     loadSaved();
   }, []);

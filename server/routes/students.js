@@ -2,10 +2,14 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const db = require('../db/database');
+const { requireAuth } = require('../middleware/auth');
 
 router.post('/signup', async (req, res) => {
   // TODO 1: read email and password off req.body — same destructuring pattern from Day 2
   const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email y contraseña son obligatorios' });
+  }
 
   // TODO 2: hash the password with bcrypt.hash(...) — remember, it returns a
   // Promise, so this needs await. Use 10 as the cost factor, same as the example earlier.
@@ -41,13 +45,27 @@ router.post('/login', async (req, res) => {
   }
   // TODO 4: if it matches, respond 200 with { id: student.id, email: student.email }
   // — never send password_hash back, ever
-  return res.status(200).json({
-    id: student.id,
-    email: student.email
+  // Guardamos el id en la SESIÓN DEL SERVIDOR (no en el navegador).
+  // regenerate() crea una sesión nueva al hacer login para evitar "session fixation".
+  req.session.regenerate((err) => {
+    if (err) return res.status(500).json({ error: 'No se pudo iniciar sesión' });
+    req.session.studentId = student.id;
+    return res.status(200).json({ id: student.id, email: student.email });
   });
 });
 
-router.put('/:id', (req, res) => {
+router.post('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.clearCookie('connect.sid');
+    res.status(200).json({ message: 'Sesión cerrada' });
+  });
+});
+
+router.put('/:id', requireAuth, (req, res) => {
+  // Solo puedes editar TU propio perfil
+  if (Number(req.params.id) !== req.session.studentId) {
+    return res.status(403).json({ error: 'No puedes editar el perfil de otra persona' });
+  }
   const { academic_level, academic_average, intended_field, location, eligibility, interests, extracurricular_acts, university_type } = req.body;
 
   // TODO 1: UPDATE student SET academic_level = ?, academic_average = ?, intended_field = ?,

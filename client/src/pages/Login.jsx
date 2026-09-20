@@ -14,6 +14,7 @@ function Login() {
     // in the body — same fetch shape as Day 2's practice POST, two awaits
     const response = await fetch(`${API_URL}/students/login`, {
         method: 'POST',
+        credentials: 'include', // manda/recibe la cookie de sesión
         headers: {
           'Content-Type': 'application/json'
         },

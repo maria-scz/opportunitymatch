@@ -1,11 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
+const { requireAuth } = require('../middleware/auth');
+
+// Todas las rutas de guardados exigen login
+router.use(requireAuth);
 
 // POST — save an opportunity for a student
 router.post('/', (req, res) => {
   // TODO 1: destructure student_id, opportunity_id, status from req.body
-  const { student_id , opportunity_id, status } = req.body;
+  // student_id ya NO viene del cliente: sale de la sesión (así nadie guarda a nombre de otro)
+  const student_id = req.session.studentId;
+  const { opportunity_id, status } = req.body;
 
   try {
     // TODO 2: INSERT INTO saved_opportunities (student_id, opportunity_id, status)
@@ -32,7 +38,7 @@ router.get('/', (req, res) => {
     FROM saved_opportunities
     JOIN opportunity ON saved_opportunities.opportunity_id = opportunity.id
     WHERE saved_opportunities.student_id = ?
-  `).all(req.query.student_id);
+  `).all(req.session.studentId);
   res.json(rows);
 });
 
@@ -42,7 +48,9 @@ router.put('/:id', (req, res) => {
   // UPDATE saved_opportunities SET status = ? WHERE id = ?
   // respond with a success message
   const { status } = req.body;
-    db.prepare('UPDATE saved_opportunities SET status = ? WHERE id = ?').run(status, req.params.id);
+    // "AND student_id = ?" garantiza que solo edites TUS guardados
+    const result = db.prepare('UPDATE saved_opportunities SET status = ? WHERE id = ? AND student_id = ?').run(status, req.params.id, req.session.studentId);
+    if (result.changes === 0) return res.status(404).json({ error: 'No encontrada' });
     res.status(200).json({ message: `Opportunity actualizada a ${status}` });
 });
 
@@ -50,7 +58,8 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   // TODO 7: DELETE FROM saved_opportunities WHERE id = ?
   // respond with a success message
-  db.prepare('DELETE FROM saved_opportunities WHERE id = ?').run(req.params.id);
+  const result = db.prepare('DELETE FROM saved_opportunities WHERE id = ? AND student_id = ?').run(req.params.id, req.session.studentId);
+  if (result.changes === 0) return res.status(404).json({ error: 'No encontrada' });
   res.status(200).json({ message: 'Opportunity eliminada.'})
 });
 

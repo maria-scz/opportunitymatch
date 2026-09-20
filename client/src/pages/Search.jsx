@@ -32,8 +32,9 @@ function Search() {
 
     const response = await fetch(`${API_URL}/saved-opportunities`, {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ student_id: studentId, opportunity_id: opportunityId, status: 'saved' })
+      body: JSON.stringify({ opportunity_id: opportunityId, status: 'saved' })
     });
 
     const data = await response.json();
